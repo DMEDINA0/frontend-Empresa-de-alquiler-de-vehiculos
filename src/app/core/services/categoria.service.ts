@@ -1,7 +1,16 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { Categoria, CategoriaFilters, CreateCategoriaRequest, UpdateCategoriaRequest } from '../../shared/models/categoria.model';
-import { ApiResponse, PaginatedResponse, PaginationParams } from '../models/api-response.model';
+import {
+  Categoria,
+  CategoriaFilters,
+  CreateCategoriaRequest,
+  UpdateCategoriaRequest
+} from '../../shared/models/categoria.model';
+import {
+  ApiResponse,
+  PaginatedResponse,
+  PaginationParams
+} from '../models/api-response.model';
 import { ApiService } from './api.service';
 
 @Injectable({
@@ -10,17 +19,20 @@ import { ApiService } from './api.service';
 export class CategoriaService {
   private readonly endpoint = '/categorias';
 
-  constructor(private apiService: ApiService) { }
+  constructor(private apiService: ApiService) {}
 
   /**
-   * Obtiene todas las categorías con paginación
+   * Obtiene todas las categorías con paginación y filtros
    */
-  getCategorias(pagination: PaginationParams, filters?: CategoriaFilters): Observable<PaginatedResponse<Categoria>> {
+  getCategorias(
+    pagination: PaginationParams,
+    filters?: CategoriaFilters
+  ): Observable<PaginatedResponse<Categoria>> {
     return this.apiService.getPaginated<Categoria>(this.endpoint, pagination, filters);
   }
 
   /**
-   * Obtiene una categoría por ID
+   * Obtiene una categoría por su ID
    */
   getCategoriaById(id: number): Observable<ApiResponse<Categoria>> {
     return this.apiService.get<Categoria>(`${this.endpoint}/${id}`);

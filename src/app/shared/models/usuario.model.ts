@@ -2,11 +2,17 @@
  * Modelo para la entidad Usuario
  */
 export interface Usuario {
-  id: number;
+  id_usuario: string;
+  primer_nombre: string;
+  segundo_nombre?: string;
+  primer_apellido: string;
+  segundo_apellido?: string;
+  rol_usuario: string;
   email: string;
-  nombre: string;
-  apellido: string;
   activo: boolean;
+  es_admin: boolean;
+  id_cliente?: string;
+  id_usuario_creacion?: string;
   fecha_creacion: string;
   fecha_actualizacion: string;
   ultimo_acceso?: string;
@@ -16,10 +22,15 @@ export interface Usuario {
  * Modelo para crear un nuevo usuario
  */
 export interface CreateUsuarioRequest {
+  primer_nombre: string;
+  segundo_nombre?: string;
+  primer_apellido: string;
+  segundo_apellido?: string;
+  rol_usuario: string;
   email: string;
-  password: string;
-  nombre: string;
-  apellido: string;
+  password: string; // ✅ corregido
+  id_cliente?: string;
+  id_usuario_creacion?: string;
   activo?: boolean;
 }
 
@@ -27,9 +38,14 @@ export interface CreateUsuarioRequest {
  * Modelo para actualizar un usuario
  */
 export interface UpdateUsuarioRequest {
+  primer_nombre?: string;
+  segundo_nombre?: string;
+  primer_apellido?: string;
+  segundo_apellido?: string;
+  rol_usuario?: string;
   email?: string;
-  nombre?: string;
-  apellido?: string;
+  password?: string; // ✅ corregido
+  id_cliente?: string;
   activo?: boolean;
 }
 
@@ -46,8 +62,9 @@ export interface ChangePasswordRequest {
  */
 export interface UsuarioFilters {
   email?: string;
-  nombre?: string;
-  apellido?: string;
+  rol_usuario?: string;
+  primer_nombre?: string;
+  primer_apellido?: string;
   activo?: boolean;
   fecha_desde?: string;
   fecha_hasta?: string;

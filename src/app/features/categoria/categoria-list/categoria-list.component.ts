@@ -18,9 +18,9 @@ export class CategoriaListComponent implements OnInit {
   currentPage = 1;
   totalPages = 1;
   pageSize = 10;
-  
+
   filters: CategoriaFilters = {};
-  
+
   // Modal properties
   showModal = false;
   editingCategoria: Categoria | null = null;
@@ -30,20 +30,10 @@ export class CategoriaListComponent implements OnInit {
     activa: true
   };
 
-  constructor(private categoriaService: CategoriaService) { }
+  constructor(private categoriaService: CategoriaService) {}
 
   ngOnInit(): void {
-    // Agregar un dato dummy para pruebas
-    this.categorias = [{
-      id: 1,
-      nombre: 'Tecnología',
-      descripcion: 'Categoría para productos tecnológicos',
-      activa: true,
-      fecha_creacion: new Date().toISOString(),
-      fecha_actualizacion: new Date().toISOString()
-    }];
-    this.totalPages = 1;
-    // this.loadCategorias();
+    this.loadCategorias();
   }
 
   loadCategorias(): void {
@@ -121,13 +111,12 @@ export class CategoriaListComponent implements OnInit {
     }
 
     if (this.editingCategoria) {
-      // Actualizar categoría existente
       const updateData = {
         nombre: this.categoriaForm.nombre,
         descripcion: this.categoriaForm.descripcion,
         activa: this.categoriaForm.activa
       };
-      
+
       this.categoriaService.updateCategoria(this.editingCategoria.id, updateData).subscribe({
         next: () => {
           this.loadCategorias();
@@ -139,13 +128,12 @@ export class CategoriaListComponent implements OnInit {
         }
       });
     } else {
-      // Crear nueva categoría
       const newCategoria = {
         nombre: this.categoriaForm.nombre,
         descripcion: this.categoriaForm.descripcion,
         activa: this.categoriaForm.activa
       };
-      
+
       this.categoriaService.createCategoria(newCategoria).subscribe({
         next: () => {
           this.loadCategorias();

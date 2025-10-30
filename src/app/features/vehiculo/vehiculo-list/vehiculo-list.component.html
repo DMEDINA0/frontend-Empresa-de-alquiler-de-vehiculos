@@ -1,0 +1,164 @@
+<div class="vehiculo-list">
+  <div class="card">
+    <div class="card-header">
+      <h2 class="card-title">Gestión de Vehículos</h2>
+      <button class="btn btn-success" (click)="openCreateModal()">Nuevo Vehículo</button>
+    </div>
+
+    <div class="card-body">
+      <!-- Filtros -->
+      <div class="filters mb-3">
+        <div class="row">
+          <div class="col-md-3">
+            <input
+              type="text"
+              class="form-control"
+              placeholder="Buscar por nombre..."
+              [(ngModel)]="filters.nombre"
+              (input)="onFilterChange()"
+            >
+          </div>
+          <div class="col-md-2">
+            <input
+              type="number"
+              class="form-control"
+              placeholder="Tarifa mínima"
+              [(ngModel)]="filters.tarifa_min"
+              (input)="onFilterChange()"
+            >
+          </div>
+          <div class="col-md-2">
+            <input
+              type="number"
+              class="form-control"
+              placeholder="Tarifa máxima"
+              [(ngModel)]="filters.tarifa_max"
+              (input)="onFilterChange()"
+            >
+          </div>
+          <div class="col-md-2">
+            <select
+              class="form-control"
+              [(ngModel)]="filters.disponible"
+              (change)="onFilterChange()"
+            >
+              <option [ngValue]="undefined">Todos los estados</option>
+              <option [ngValue]="true">Disponibles</option>
+              <option [ngValue]="false">No disponibles</option>
+            </select>
+          </div>
+          <div class="col-md-2">
+            <button class="btn btn-secondary" (click)="clearFilters()">Limpiar</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tabla de vehículos -->
+      <div class="table-responsive">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Nombre</th>
+              <th>Tarifa</th>
+              <th>Categoría</th>
+              <th>Estado</th>
+              <th>Fecha Creación</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngIf="loading">
+              <td colspan="7" class="text-center">Cargando...</td>
+            </tr>
+            <tr *ngIf="!loading && vehiculos?.length === 0">
+              <td colspan="7" class="text-center">No hay vehículos disponibles</td>
+            </tr>
+            <tr *ngFor="let vehiculo of vehiculos">
+              <td>{{ vehiculo.id_vehiculo }}</td>
+              <td>{{ vehiculo.nombre }}</td>
+              <td>{{ vehiculo.tarifa_hora | currency:'COP':'symbol':'1.0-0' }}</td>
+              <td>{{ vehiculo.categoria?.nombre_categoria || '-' }}</td>
+              <td>
+                <span class="badge" [class.badge-success]="vehiculo.disponible" [class.badge-danger]="!vehiculo.disponible">
+                  {{ vehiculo.disponible ? 'Disponible' : 'No disponible' }}
+                </span>
+              </td>
+              <td>{{ vehiculo.fecha_creacion | date:'short' }}</td>
+              <td>
+                <button class="btn btn-sm btn-primary" (click)="editVehiculo(vehiculo)">Editar</button>
+                <button class="btn btn-sm btn-danger" (click)="deleteVehiculo(vehiculo)">Eliminar</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Paginación -->
+      <div class="pagination mt-3" *ngIf="totalPages > 1">
+        <button class="btn btn-secondary" [disabled]="currentPage === 1" (click)="goToPage(currentPage - 1)">Anterior</button>
+        <span class="mx-3">Página {{ currentPage }} de {{ totalPages }}</span>
+        <button class="btn btn-secondary" [disabled]="currentPage === totalPages" (click)="goToPage(currentPage + 1)">Siguiente</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal para crear/editar vehículo -->
+  <div
+  class="modal fade"
+  tabindex="-1"
+  role="dialog"
+  [class.show]="showModal"
+  [style.display]="showModal ? 'block' : 'none'"
+  style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); overflow-y: auto; z-index: 1050;"
+>
+<div class="modal-dialog" role="document" style="margin: 8rem auto 2rem auto; max-width: 500px;">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">{{ editingVehiculo ? 'Editar Vehículo' : 'Nuevo Vehículo' }}</h5>
+          <button type="button" class="close" (click)="closeModal()">
+            <span>&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <form (ngSubmit)="saveVehiculo()">
+            <div class="form-group">
+              <label for="nombre">Nombre *</label>
+              <input type="text" class="form-control" id="nombre" [(ngModel)]="vehiculoForm.nombre" name="nombre" required>
+            </div>
+            <div class="form-group">
+              <label for="tarifa_hora">Tarifa por hora *</label>
+              <input type="number" class="form-control" id="tarifa_hora" [(ngModel)]="vehiculoForm.tarifa_hora" name="tarifa_hora" required min="0">
+            </div>
+            <div class="form-group">
+              <label for="id_categoria">Categoría *</label>
+              <select class="form-control" id="id_categoria" [(ngModel)]="vehiculoForm.id_categoria" name="id_categoria" required>
+                <option value="">Seleccione una categoría</option>
+                <option value="1">Sedán</option>
+                <option value="2">SUV</option>
+                <option value="3">Camioneta</option>
+                <option value="4">Moto</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="id_usuario_creacion">Usuario creador *</label>
+              <input type="text" class="form-control" id="id_usuario_creacion" [(ngModel)]="vehiculoForm.id_usuario_creacion" name="id_usuario_creacion" required>
+            </div>
+            <div class="form-group">
+              <div class="form-check">
+                <input type="checkbox" class="form-check-input" id="disponible" [(ngModel)]="vehiculoForm.disponible" name="disponible">
+                <label class="form-check-label" for="disponible">Vehículo disponible</label>
+              </div>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" (click)="closeModal()">Cancelar</button>
+          <button type="button" class="btn btn-primary" (click)="saveVehiculo()">
+            {{ editingVehiculo ? 'Actualizar' : 'Crear' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

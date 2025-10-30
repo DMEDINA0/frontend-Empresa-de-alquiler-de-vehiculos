@@ -18,36 +18,26 @@ export class UsuarioListComponent implements OnInit {
   currentPage = 1;
   totalPages = 1;
   pageSize = 10;
-  
+
   filters: UsuarioFilters = {};
-  
-  // Modal properties
+
   showModal = false;
   editingUsuario: Usuario | null = null;
   usuarioForm = {
+    primer_nombre: '',
+    segundo_nombre: '',
+    primer_apellido: '',
+    segundo_apellido: '',
+    rol_usuario: 'usuario',
     email: '',
-    nombre: '',
-    apellido: '',
     password: '',
     activo: true
   };
 
-  constructor(private usuarioService: UsuarioService) { }
+  constructor(private usuarioService: UsuarioService) {}
 
   ngOnInit(): void {
-    // Agregar un dato dummy para pruebas
-    this.usuarios = [{
-      id: 1,
-      email: 'admin@example.com',
-      nombre: 'Administrador',
-      apellido: 'Sistema',
-      activo: true,
-      ultimo_acceso: new Date().toISOString(),
-      fecha_creacion: new Date().toISOString(),
-      fecha_actualizacion: new Date().toISOString()
-    }];
-    this.totalPages = 1;
-    // this.loadUsuarios();
+    this.loadUsuarios();
   }
 
   loadUsuarios(): void {
@@ -91,9 +81,12 @@ export class UsuarioListComponent implements OnInit {
   openCreateModal(): void {
     this.editingUsuario = null;
     this.usuarioForm = {
+      primer_nombre: '',
+      segundo_nombre: '',
+      primer_apellido: '',
+      segundo_apellido: '',
+      rol_usuario: 'usuario',
       email: '',
-      nombre: '',
-      apellido: '',
       password: '',
       activo: true
     };
@@ -103,9 +96,12 @@ export class UsuarioListComponent implements OnInit {
   editUsuario(usuario: Usuario): void {
     this.editingUsuario = usuario;
     this.usuarioForm = {
+      primer_nombre: usuario.primer_nombre,
+      segundo_nombre: usuario.segundo_nombre || '',
+      primer_apellido: usuario.primer_apellido,
+      segundo_apellido: usuario.segundo_apellido || '',
+      rol_usuario: usuario.rol_usuario,
       email: usuario.email,
-      nombre: usuario.nombre,
-      apellido: usuario.apellido,
       password: '',
       activo: usuario.activo
     };
@@ -116,40 +112,35 @@ export class UsuarioListComponent implements OnInit {
     this.showModal = false;
     this.editingUsuario = null;
     this.usuarioForm = {
+      primer_nombre: '',
+      segundo_nombre: '',
+      primer_apellido: '',
+      segundo_apellido: '',
+      rol_usuario: 'usuario',
       email: '',
-      nombre: '',
-      apellido: '',
       password: '',
       activo: true
     };
   }
 
   saveUsuario(): void {
-    if (!this.usuarioForm.email.trim() || !this.usuarioForm.nombre.trim() || !this.usuarioForm.apellido.trim()) {
+    const { email, primer_nombre, primer_apellido, password } = this.usuarioForm;
+
+    if (!email.trim() || !primer_nombre.trim() || !primer_apellido.trim()) {
       alert('Email, nombre y apellido son requeridos');
       return;
     }
 
-    if (!this.editingUsuario && !this.usuarioForm.password.trim()) {
+    if (!this.editingUsuario && !password.trim()) {
       alert('La contraseña es requerida para nuevos usuarios');
       return;
     }
 
     if (this.editingUsuario) {
-      // Actualizar usuario existente
-      const updateData: any = {
-        email: this.usuarioForm.email,
-        nombre: this.usuarioForm.nombre,
-        apellido: this.usuarioForm.apellido,
-        activo: this.usuarioForm.activo
-      };
-      
-      // Solo incluir password si se proporcionó
-      if (this.usuarioForm.password.trim()) {
-        updateData.password = this.usuarioForm.password;
-      }
-      
-      this.usuarioService.updateUsuario(this.editingUsuario.id, updateData).subscribe({
+      const updateData: any = { ...this.usuarioForm };
+      if (!password.trim()) delete updateData.password;
+
+      this.usuarioService.updateUsuario(this.editingUsuario.id_usuario, updateData).subscribe({
         next: () => {
           this.loadUsuarios();
           this.closeModal();
@@ -160,16 +151,7 @@ export class UsuarioListComponent implements OnInit {
         }
       });
     } else {
-      // Crear nuevo usuario
-      const newUsuario = {
-        email: this.usuarioForm.email,
-        nombre: this.usuarioForm.nombre,
-        apellido: this.usuarioForm.apellido,
-        password: this.usuarioForm.password,
-        activo: this.usuarioForm.activo
-      };
-      
-      this.usuarioService.createUsuario(newUsuario).subscribe({
+      this.usuarioService.createUsuario(this.usuarioForm).subscribe({
         next: () => {
           this.loadUsuarios();
           this.closeModal();
@@ -184,7 +166,7 @@ export class UsuarioListComponent implements OnInit {
 
   deleteUsuario(usuario: Usuario): void {
     if (confirm(`¿Está seguro de eliminar el usuario "${usuario.email}"?`)) {
-      this.usuarioService.deleteUsuario(usuario.id).subscribe({
+      this.usuarioService.deleteUsuario(usuario.id_usuario).subscribe({
         next: () => {
           this.loadUsuarios();
         },

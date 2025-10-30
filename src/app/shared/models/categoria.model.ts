@@ -1,6 +1,4 @@
-/**
- * Modelo para la entidad Categoría
- */
+/** Modelo para la entidad Categoría */
 export interface Categoria {
   id: number;
   nombre: string;
@@ -8,29 +6,24 @@ export interface Categoria {
   activa: boolean;
   fecha_creacion: string;
   fecha_actualizacion: string;
+  id_usuario_creacion?: string;
 }
 
-/**
- * Modelo para crear una nueva categoría
- */
+/** Modelo para crear una nueva categoría */
 export interface CreateCategoriaRequest {
   nombre: string;
   descripcion?: string;
   activa?: boolean;
 }
 
-/**
- * Modelo para actualizar una categoría
- */
+/** Modelo para actualizar una categoría */
 export interface UpdateCategoriaRequest {
   nombre?: string;
   descripcion?: string;
   activa?: boolean;
 }
 
-/**
- * Modelo para filtros de categorías
- */
+/** Modelo para filtros de categorías */
 export interface CategoriaFilters {
   nombre?: string;
   activa?: boolean;

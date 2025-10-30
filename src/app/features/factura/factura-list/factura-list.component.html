@@ -1,0 +1,153 @@
+<div class="factura-list">
+  <div class="card">
+    <div class="card-header">
+      <h2 class="card-title">Gestión de Facturas</h2>
+      <button class="btn btn-success" (click)="openCreateModal()">
+        Generar Factura
+      </button>
+    </div>
+
+    <div class="card-body">
+      <!-- Filtros -->
+      <div class="filters mb-3">
+        <div class="row">
+          <div class="col-md-4">
+            <input
+              type="text"
+              class="form-control"
+              placeholder="Buscar por ID de alquiler..."
+              [(ngModel)]="filters.id_alquiler"
+              (input)="onFilterChange()"
+            >
+          </div>
+          <div class="col-md-3">
+            <input
+              type="date"
+              class="form-control"
+              [(ngModel)]="filters.fecha_desde"
+              (change)="onFilterChange()"
+            >
+          </div>
+          <div class="col-md-3">
+            <input
+              type="date"
+              class="form-control"
+              [(ngModel)]="filters.fecha_hasta"
+              (change)="onFilterChange()"
+            >
+          </div>
+          <div class="col-md-2">
+            <button class="btn btn-secondary" (click)="clearFilters()">
+              Limpiar
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tabla de facturas -->
+      <div class="table-responsive">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>ID Alquiler</th>
+              <th>Usuario</th>
+              <th>Fecha Emisión</th>
+              <th>Monto Total</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngIf="loading">
+              <td colspan="6" class="text-center">Cargando...</td>
+            </tr>
+            <tr *ngIf="!loading && facturas?.length === 0">
+              <td colspan="6" class="text-center">No hay facturas disponibles</td>
+            </tr>
+            <tr *ngFor="let factura of facturas">
+              <td>{{ factura.id_factura }}</td>
+              <td>{{ factura.id_alquiler }}</td>
+              <td>{{ factura.id_usuario_creacion }}</td>
+              <td>{{ factura.fecha_emision | date:'shortDate' }}</td>
+              <td>{{ factura.monto_total | currency:'COP':'symbol':'1.0-0' }}</td>
+              <td>
+                <button class="btn btn-sm btn-danger" (click)="deleteFactura(factura)">
+                  Eliminar
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Paginación -->
+      <div class="pagination mt-3" *ngIf="totalPages > 1">
+        <button
+          class="btn btn-secondary"
+          [disabled]="currentPage === 1"
+          (click)="goToPage(currentPage - 1)"
+        >
+          Anterior
+        </button>
+        <span class="mx-3">
+          Página {{ currentPage }} de {{ totalPages }}
+        </span>
+        <button
+          class="btn btn-secondary"
+          [disabled]="currentPage === totalPages"
+          (click)="goToPage(currentPage + 1)"
+        >
+          Siguiente
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal para generar factura -->
+  <div class="modal fade" [class.show]="showModal" [style.display]="showModal ? 'block' : 'none'" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Generar Factura</h5>
+          <button type="button" class="close" (click)="closeModal()">
+            <span>&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <form (ngSubmit)="saveFactura()">
+            <div class="form-group">
+              <label for="id_alquiler">ID de Alquiler *</label>
+              <input
+                type="text"
+                class="form-control"
+                id="id_alquiler"
+                [(ngModel)]="facturaForm.id_alquiler"
+                name="id_alquiler"
+                required
+                placeholder="ID del alquiler"
+              >
+            </div>
+            <div class="form-group">
+              <label for="id_usuario_creacion">ID Usuario *</label>
+              <input
+                type="text"
+                class="form-control"
+                id="id_usuario_creacion"
+                [(ngModel)]="facturaForm.id_usuario_creacion"
+                name="id_usuario_creacion"
+                required
+                placeholder="ID del usuario que genera"
+              >
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" (click)="closeModal()">Cancelar</button>
+          <button type="button" class="btn btn-primary" (click)="saveFactura()">
+            Generar
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

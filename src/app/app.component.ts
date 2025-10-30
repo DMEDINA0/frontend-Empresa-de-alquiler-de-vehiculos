@@ -32,13 +32,13 @@ import { SidebarComponent } from './shared/components/sidebar/sidebar.component'
       left: 0;
       z-index: 1000;
       width: 260px;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      background: linear-gradient(135deg, #667eea 0%, #a24b4eff 100%);
       box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
       transition: all 0.3s ease;
     }
 
     .sidebar[data-color="red"] {
-      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+      background: linear-gradient(135deg, #e65bf6d6 0%, #06129bff 100%);
     }
 
     .main-panel {
